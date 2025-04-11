@@ -19,6 +19,7 @@ phases:
       - echo "Pushing image to Docker Hub..."
       - docker tag shad:latest Shivopam/shad:latest
       - docker push Shivopam/shad:latest
+      - rm docker-hub-password.txt  # Optional cleanup
 
 artifacts:
   files:
