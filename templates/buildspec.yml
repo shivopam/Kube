@@ -2,29 +2,37 @@ version: 0.2
 
 phases:
   install:
+    runtime-versions:
+      docker: 20
+      python: 3.11
     commands:
-      - echo "Installing dependencies..."
+      - echo "Updating pip..."
+      - pip install --upgrade pip
+
+  pre_build:
+    commands:
+      - echo "Cloning GitHub repo..."
+      - git clone https://github.com/shivopam/Kube.git
+      - cd Kube/templates
+      - echo "Installing Python requirements..."
       - pip install -r requirements.txt
+      - echo "Fetching Docker Hub password from SSM..."
+      - aws ssm get-parameters --name my_vault --with-decryption --query 'Parameters[0].Value' --output text > docker-hub-password.txt
 
   build:
     commands:
       - echo "Building Docker image..."
-      - docker build -t shad .
+      - docker build -t Shad .
 
   post_build:
     commands:
-      - echo "Logging in to Docker Hub..."
-      - aws ssm get-parameters --name docker-hub-password --with-decryption --query 'Parameters[0].Value' --output text > docker-hub-password.txt
+      - echo "Logging into Docker Hub..."
       - docker login -u Shivopam -p $(cat docker-hub-password.txt)
-      - echo "Pushing image to Docker Hub..."
-      - docker tag shad:latest Shivopam/shad:latest
-      - docker push Shivopam/shad:latest
-      - rm docker-hub-password.txt  # Optional cleanup
+      - echo "Tagging and pushing image..."
+      - docker tag Shad:latest Shivopam/Shad:latest
+      - docker push Shivopam/Shad:latest
+      - rm docker-hub-password.txt
 
 artifacts:
   files:
     - '**/*'
-
-cache:
-  paths:
-    - '**/node_modules/**'
