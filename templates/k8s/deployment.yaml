@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: shad-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: shad
+  template:
+    metadata:
+      labels:
+        app: shad
+    spec:
+      containers:
+      - name: shad
+        image: shivopam/shad:latest
+        ports:
+        - containerPort: 5000
