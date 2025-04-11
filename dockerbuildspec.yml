@@ -10,27 +10,26 @@ phases:
 
   pre_build:
     commands:
-      - echo "Navigating to the templates folder..."
-      - cd $CODEBUILD_SRC_DIR/templates
-      - echo "Listing the contents of the 'templates' folder..."
-      - ls -alh  # This will list all files in the template directory
-      - echo "Installing Python dependencies from requirements.txt..."
-      - pip install -r requirements.txt
+      - echo "Listing the contents of the templates folder..."
+      - ls -alh $CODEBUILD_SRC_DIR/templates
+      - echo "Installing Python dependencies from templates/requirements.txt..."
+      - pip install -r $CODEBUILD_SRC_DIR/templates/requirements.txt
       - echo "Fetching Docker Hub password from SSM..."
       - aws ssm get-parameters --name my_vault --with-decryption --query 'Parameters[0].Value' --output text > docker-hub-password.txt
+      - echo "Logging into Docker Hub to avoid rate limit issues..."
+      - docker login -u shivopam -p $(cat docker-hub-password.txt)
 
   build:
     commands:
       - echo "Building Docker image..."
-      - docker build -t shad -f $CODEBUILD_SRC_DIR/templates/Dockerfile .
+      - docker build -t shad -f $CODEBUILD_SRC_DIR/templates/Dockerfile $CODEBUILD_SRC_DIR/templates
 
   post_build:
     commands:
-      - echo "Logging into Docker Hub..."
-      - docker login -u shivopam -p $(cat docker-hub-password.txt)
-      - echo "Tagging and pushing image..."
+      - echo "Tagging and pushing image to Docker Hub..."
       - docker tag shad:latest shivopam/shad:latest
       - docker push shivopam/shad:latest
+      - echo "Cleaning up..."
       - rm docker-hub-password.txt
 
 artifacts:
