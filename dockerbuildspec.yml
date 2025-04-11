@@ -12,7 +12,8 @@ phases:
     commands:
       - echo "Navigating to the template folder..."
       - cd $CODEBUILD_SRC_DIR/templates
-      - echo "Installing Python requirements..."
+      - echo "Installing Python dependencies..."
+      - ls -alh  # List files to check if requirements.txt is present
       - pip install -r requirements.txt
       - echo "Fetching Docker Hub password from SSM..."
       - aws ssm get-parameters --name my_vault --with-decryption --query 'Parameters[0].Value' --output text > docker-hub-password.txt
