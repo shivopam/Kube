@@ -10,22 +10,22 @@ phases:
 
   pre_build:
     commands:
-      - echo "Changing to templates directory..."
-      - cd template
-      - echo "Installing Python dependencies..."
+      - echo "Moving into template folder..."
+      - cd $CODEBUILD_SRC_DIR/template
+      - echo "Installing Python requirements..."
       - pip install -r requirements.txt
       - echo "Fetching Docker Hub password from SSM..."
       - aws ssm get-parameters --name my_vault --with-decryption --query 'Parameters[0].Value' --output text > docker-hub-password.txt
 
   build:
     commands:
-      - cd template
+      - cd $CODEBUILD_SRC_DIR/template
       - echo "Building Docker image..."
       - docker build -t shad .
 
   post_build:
     commands:
-      - cd template
+      - cd $CODEBUILD_SRC_DIR/template
       - echo "Logging into Docker Hub..."
       - docker login -u shivopam -p $(cat docker-hub-password.txt)
       - echo "Tagging and pushing image..."
