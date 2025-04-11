@@ -1,4 +1,4 @@
-version: 0.2.0
+version: 0.2
 
 phases:
   install:
@@ -14,7 +14,7 @@ phases:
   post_build:
     commands:
       - echo "Logging in to Docker Hub..."
-      - aws ssm get-parameters --name my_vault --with-decryption --query 'Parameters[0].Value' --output text > docker-hub-password.txt
+      - aws ssm get-parameters --name docker-hub-password --with-decryption --query 'Parameters[0].Value' --output text > docker-hub-password.txt
       - docker login -u Shivopam -p $(cat docker-hub-password.txt)
       - echo "Pushing image to Docker Hub..."
       - docker tag shad:latest Shivopam/shad:latest
