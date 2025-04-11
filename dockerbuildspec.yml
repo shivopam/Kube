@@ -10,8 +10,6 @@ phases:
 
   pre_build:
     commands:
-      - echo "Moving into template folder..."
-      - cd $CODEBUILD_SRC_DIR/template
       - echo "Installing Python requirements..."
       - pip install -r requirements.txt
       - echo "Fetching Docker Hub password from SSM..."
@@ -19,13 +17,11 @@ phases:
 
   build:
     commands:
-      - cd $CODEBUILD_SRC_DIR/template
       - echo "Building Docker image..."
       - docker build -t shad .
 
   post_build:
     commands:
-      - cd $CODEBUILD_SRC_DIR/template
       - echo "Logging into Docker Hub..."
       - docker login -u shivopam -p $(cat docker-hub-password.txt)
       - echo "Tagging and pushing image..."
