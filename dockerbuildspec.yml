@@ -10,9 +10,8 @@ phases:
 
   pre_build:
     commands:
-      - echo "Cloning GitHub repo..."
-      - git clone https://github.com/shivopam/Kube.git
-      - cd Kube/template
+      - echo "Changing to templates directory..."
+      - cd template
       - echo "Installing Python dependencies..."
       - pip install -r requirements.txt
       - echo "Fetching Docker Hub password from SSM..."
@@ -20,11 +19,13 @@ phases:
 
   build:
     commands:
+      - cd template
       - echo "Building Docker image..."
       - docker build -t shad .
 
   post_build:
     commands:
+      - cd template
       - echo "Logging into Docker Hub..."
       - docker login -u shivopam -p $(cat docker-hub-password.txt)
       - echo "Tagging and pushing image..."
