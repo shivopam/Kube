@@ -1,20 +1,23 @@
-# Use an official Python image as a base
-FROM python:3.9-slim
+# Use a full Python image (not slim) to avoid numpy/pandas build errors
+FROM python:3.9
 
-# Set the working directory to /app
-WORKDIR /Users/shivopamtiwari/Documents/Git_repo/templates
+# Set working directory inside the container
+WORKDIR /app
 
-# Copy the requirements file
-COPY requirements.txt .
+# Copy only requirements first (for Docker caching)
+COPY templates/requirements.txt .
 
-# Install the dependencies
-RUN pip install -r requirements.txt
+# Install dependencies
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the application code
-COPY . .
+# Copy the entire app into the container
+COPY templates/ .
 
-# Expose the port the app will run on
+# Expose the port Flask runs on
 EXPOSE 5000
 
-# Run the command to start the app when the container launches
+# Set environment variable for Flask
+ENV FLASK_APP=app.py
+
+# Run Flask
 CMD ["flask", "run", "--host=0.0.0.0"]
